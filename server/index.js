@@ -49,7 +49,6 @@ app.get("/api/weather", async (req, res) => {
         .status(400)
         .json({ error: "Either coordinates or city name is required" });
     }
-    console.log(lat, lon, city);
 
     const weatherData = await fetchWeatherData({ lat, lon, city });
     res.json(weatherData);
