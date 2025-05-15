@@ -14,7 +14,29 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+
+const allowedOrigins = [
+  "http://localhost:5173", // Vite local frontend
+  "https://main.d3erp14kpzu5wp.amplifyapp.com/", // Amplify hosted frontend
+  "https://weatherappication.maheshsivangi.tech",
+];
+
+// app.use(cors());
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // if you're using cookies or sessions
+  })
+);
 app.use(express.json());
 
 // Routes

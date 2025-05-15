@@ -1,11 +1,11 @@
-import axios from 'axios';
-import dotenv from 'dotenv';
+import axios from "axios";
+import dotenv from "dotenv";
 
 dotenv.config();
 
-const API_KEY = process.env.WEATHER_API_KEY || 'YOUR_API_KEY'; // Replace with your actual API key
-const BASE_URL = 'https://api.openweathermap.org/data/2.5';
-const GEO_URL = 'https://api.openweathermap.org/geo/1.0';
+const API_KEY = process.env.WEATHER_API_KEY || "YOUR_API_KEY"; // Replace with your actual API key
+const BASE_URL = "https://api.openweathermap.org/data/2.5";
+const GEO_URL = "https://api.openweathermap.org/geo/1.0";
 
 /**
  * Fetch current weather data
@@ -16,26 +16,26 @@ export const fetchWeatherData = async (params) => {
   try {
     let url = `${BASE_URL}/weather`;
     let queryParams = {};
-    
+
     if (params.lat && params.lon) {
       queryParams = {
         lat: params.lat,
         lon: params.lon,
         appid: API_KEY,
-        units: 'metric'
+        units: "metric",
       };
     } else if (params.city) {
       queryParams = {
         q: params.city,
         appid: API_KEY,
-        units: 'metric'
+        units: "metric",
       };
     }
-    
+
     const response = await axios.get(url, { params: queryParams });
     return response.data;
   } catch (error) {
-    console.error('Error in fetchWeatherData:', error);
+    console.error("Error in fetchWeatherData:", error);
     throw error;
   }
 };
@@ -49,34 +49,34 @@ export const fetchForecastData = async (params) => {
   try {
     let url = `${BASE_URL}/forecast`;
     let queryParams = {};
-    
+
     if (params.lat && params.lon) {
       queryParams = {
         lat: params.lat,
         lon: params.lon,
         appid: API_KEY,
-        units: 'metric'
+        units: "metric",
       };
     } else if (params.city) {
       queryParams = {
         q: params.city,
         appid: API_KEY,
-        units: 'metric'
+        units: "metric",
       };
     }
-    
+
     const response = await axios.get(url, { params: queryParams });
-    
+
     // Process and group forecast data by day
     const forecastData = response.data;
     const dailyForecasts = processDailyForecasts(forecastData.list);
-    
+
     return {
       ...forecastData,
-      dailyForecasts
+      dailyForecasts,
     };
   } catch (error) {
-    console.error('Error in fetchForecastData:', error);
+    console.error("Error in fetchForecastData:", error);
     throw error;
   }
 };
@@ -92,13 +92,13 @@ export const searchLocations = async (query) => {
     const params = {
       q: query,
       limit: 5,
-      appid: API_KEY
+      appid: API_KEY,
     };
-    
+
     const response = await axios.get(url, { params });
     return response.data;
   } catch (error) {
-    console.error('Error in searchLocations:', error);
+    console.error("Error in searchLocations:", error);
     throw error;
   }
 };
@@ -110,38 +110,47 @@ export const searchLocations = async (query) => {
  */
 const processDailyForecasts = (forecastList) => {
   const dailyMap = {};
-  
-  forecastList.forEach(item => {
+
+  forecastList.forEach((item) => {
     const date = new Date(item.dt * 1000);
-    const day = date.toISOString().split('T')[0];
-    
+    const day = date.toISOString().split("T")[0];
+
     if (!dailyMap[day]) {
       dailyMap[day] = {
         date: day,
         day: getDayName(date),
         temps: {
           min: item.main.temp_min,
-          max: item.main.temp_max
+          max: item.main.temp_max,
         },
         weather: item.weather[0],
         humidity: item.main.humidity,
         wind: item.wind.speed,
-        timePoints: []
+        timePoints: [],
       };
     } else {
       // Update min/max temps
-      dailyMap[day].temps.min = Math.min(dailyMap[day].temps.min, item.main.temp_min);
-      dailyMap[day].temps.max = Math.max(dailyMap[day].temps.max, item.main.temp_max);
+      dailyMap[day].temps.min = Math.min(
+        dailyMap[day].temps.min,
+        item.main.temp_min
+      );
+      dailyMap[day].temps.max = Math.max(
+        dailyMap[day].temps.max,
+        item.main.temp_max
+      );
     }
-    
+
     // Add time point
     dailyMap[day].timePoints.push({
-      time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      time: date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       temp: item.main.temp,
-      weather: item.weather[0]
+      weather: item.weather[0],
     });
   });
-  
+
   return Object.values(dailyMap);
 };
 
@@ -151,5 +160,5 @@ const processDailyForecasts = (forecastList) => {
  * @returns {string} Day name
  */
 const getDayName = (date) => {
-  return date.toLocaleDateString('en-US', { weekday: 'short' });
+  return date.toLocaleDateString("en-US", { weekday: "short" });
 };
