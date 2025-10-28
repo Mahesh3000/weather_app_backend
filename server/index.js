@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 const allowedOrigins = [
   "http://localhost:5173", // Vite local frontend
   "https://main.d3erp14kpzu5wp.amplifyapp.com/", // Amplify hosted frontend
-  "https://weatherappication.maheshsivangi.tech",
+  // "https://weatherappication.maheshsivangi.tech",
 ];
 
 // app.use(cors());
@@ -94,7 +94,7 @@ app.get("/api/locations", async (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port${PORT}`);
 });
 
 app.get("/", (req, res) => {
